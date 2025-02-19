@@ -2,8 +2,8 @@ from django.db import models
 
 class Recipient(models.Model):
     email = models.EmailField(unique=True, verbose_name='Email')
-    first_name = models.CharField(max_length=50, verbose_name='Имя')
     last_name = models.CharField(max_length=50, verbose_name='Фамилия')
+    first_name = models.CharField(max_length=50, verbose_name='Имя')
     middle_name = models.CharField(max_length=50, blank=True, null=True, verbose_name='Отчество')
     comment = models.TextField(blank=True, null=True, verbose_name='Комментарий')
 
