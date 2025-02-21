@@ -1,7 +1,7 @@
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
-from mailing.models import Recipient
+from mailing.models import Recipient, Message
 
 
 class RecipientListView(ListView):
@@ -35,3 +35,35 @@ class RecipientUpdateView(UpdateView):
 class RecipientDeleteView(DeleteView):
     model = Recipient
     success_url = reverse_lazy('mailing:recipient_list')
+
+
+class MessageListView(ListView):
+    model = Message
+    context_object_name = 'messages'
+    paginate_by = 10
+
+
+class MessageDetailView(DetailView):
+    model = Message
+    context_object_name = 'message'
+
+
+class MessageCreateView(CreateView):
+    model = Message
+    fields = ['subject', 'body']
+
+    def get_success_url(self):
+        return reverse_lazy('mailing:message_detail', kwargs={'pk': self.object.pk})
+
+
+class MessageUpdateView(UpdateView):
+    model = Message
+    fields = ['subject', 'body']
+
+    def get_success_url(self):
+        return reverse_lazy('mailing:message_detail', kwargs={'pk': self.object.pk})
+
+
+class MessageDeleteView(DeleteView):
+    model = Message
+    success_url = reverse_lazy('mailing:message_list')

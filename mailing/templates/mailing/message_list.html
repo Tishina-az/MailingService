@@ -1,0 +1,58 @@
+{% extends 'mailing/base.html' %}
+
+{% block title %}Сообщения{% endblock %}
+
+{% block content %}
+<nav class="mb-5 text-center">
+    <a class="p-2 btn btn-outline-primary" href="{% url 'mailing:recipient_create' %}">Добавить сообщение</a>
+</nav>
+<div class="container">
+    <h3 class="text-center mb-3">Список доступных сообщений:</h3>
+    <div class="row text-center">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Тема письма</th>
+                    <th scope="col">Тело письма</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for message in messages %}
+                <tr onclick="window.location='{% url 'mailing:message_detail' message.pk %}';" style="cursor: pointer;">
+                    <th class="col-1" scope="row">{{ message.id }}</th>
+                    <td class="col-3">{{ message.subject }}</td>
+                    <td class="col-8">{{ message.body|truncatechars:200 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- Пагинация -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination mt-3">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endblock %}

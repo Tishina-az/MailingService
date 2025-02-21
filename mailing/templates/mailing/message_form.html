@@ -1,0 +1,25 @@
+{% extends 'mailing/base.html' %}
+
+{% block title %}Добавить сообщение{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <h3 class="text-center mb-4 mt-3">Добавьте новое сообщение для рассылок:</h3>
+        <div class="col-2"></div>
+        <div class="col-8">
+            <form class="row" method="post" enctype="multipart/form-data">
+               <div class="card">
+                   <div class="card-body">
+                      {% csrf_token %}
+                      {{ form.as_p }}
+                      <button type="submit" class="btn btn-primary">Сохранить</button>
+                      <a href="{% url 'mailing:message_list' %}" class="btn btn-warning">Отменить</a>
+                   </div>
+               </div>
+            </form>
+        </div>
+        <div class="col-2"></div>
+    </div>
+</div>
+{% endblock %}
