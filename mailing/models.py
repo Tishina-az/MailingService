@@ -33,3 +33,29 @@ class Message(models.Model):
     class Meta:
         verbose_name = 'Сообщение'
         verbose_name_plural = 'Сообщения'
+
+
+class Mailing(models.Model):
+    CREATED = 'created'
+    LAUNCHED = 'launched'
+    COMPLETED = 'completed'
+
+    MAILING_STATUS = [
+        (CREATED, 'Создана'),
+        (LAUNCHED, 'Запущена'),
+        (COMPLETED, 'Завершена'),
+    ]
+
+    started_date = models.DateTimeField(verbose_name='Дата и время первой отправки')
+    ended_date = models.DateTimeField(verbose_name='Дата и время окончания отправки')
+    status = models.CharField(max_length=9, choices=MAILING_STATUS, default=CREATED, verbose_name='Статус')
+    message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name='mailings', verbose_name='Сообщение')
+    recipients = models.ManyToManyField(Recipient, related_name='mailings', verbose_name='Получатели')
+
+    def __str__(self):
+        return self.status
+
+    class Meta:
+        verbose_name = 'Рассылка'
+        verbose_name_plural = 'Рассылки'
+        ordering = ['started_date']
