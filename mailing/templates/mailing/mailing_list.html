@@ -1,0 +1,68 @@
+{% extends 'mailing/base.html' %}
+
+{% block title %}Сообщения{% endblock %}
+
+{% block content %}
+<nav class="mb-5 text-center">
+    <a class="p-2 btn btn-outline-primary" href="{% url 'mailing:mailing_create' %}">Добавить рассылку</a>
+</nav>
+<div class="container">
+    <h3 class="text-center mb-3">Список рассылок:</h3>
+    <div class="row text-center">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Старт рассылки</th>
+                    <th scope="col">Окончание рассылки</th>
+                    <th scope="col">Статус</th>
+                    <th scope="col">Тема рассылки</th>
+                    <th scope="col">Получатели</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for mailing in mailings %}
+                <tr onclick="window.location='{% url 'mailing:mailing_detail' mailing.pk %}';" style="cursor: pointer;">
+                    <th class="col-1" scope="row">{{ mailing.id }}</th>
+                    <td class="col-2">{{ mailing.started_date|date:"d F Yг. H:i:s" }}</td>
+                    <td class="col-2">{{ mailing.ended_date|date:"d F Yг. H:i:s" }}</td>
+                    <td class="col-2">{{ mailing.status }}</td>
+                    <td class="col-2">{{ mailing.message }}</td>
+                    <td class="col-3">
+                        {% for email in mailing.get_recipient_emails %}
+                            <a class="link-opacity-75-hover" href="mailto: {{ email }}" onclick="event.stopPropagation();">{{ email }}</a>
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- Пагинация -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination mt-3">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endblock %}

@@ -55,6 +55,9 @@ class Mailing(models.Model):
     def __str__(self):
         return self.status
 
+    def get_recipient_emails(self):
+        return [recipient.email for recipient in self.recipients.all()]
+
     class Meta:
         verbose_name = 'Рассылка'
         verbose_name_plural = 'Рассылки'
