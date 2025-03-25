@@ -1,6 +1,7 @@
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
+from mailing.forms import RecipientForm, MessageForm, MailingForm
 from mailing.models import Recipient, Message, Mailing
 
 
@@ -18,7 +19,7 @@ class RecipientDetailView(DetailView):
 
 class RecipientCreateView(CreateView):
     model = Recipient
-    fields = ['first_name', 'last_name', 'middle_name', 'email', 'comment']
+    form_class = RecipientForm
 
     def get_success_url(self):
         return reverse_lazy('mailing:recipient_detail', kwargs={'pk': self.object.pk})
@@ -26,7 +27,7 @@ class RecipientCreateView(CreateView):
 
 class RecipientUpdateView(UpdateView):
     model = Recipient
-    fields = ['first_name', 'last_name', 'middle_name', 'email', 'comment']
+    form_class = RecipientForm
 
     def get_success_url(self):
         return reverse_lazy('mailing:recipient_detail', kwargs={'pk': self.object.pk})
@@ -50,7 +51,7 @@ class MessageDetailView(DetailView):
 
 class MessageCreateView(CreateView):
     model = Message
-    fields = ['subject', 'body']
+    form_class = MessageForm
 
     def get_success_url(self):
         return reverse_lazy('mailing:message_detail', kwargs={'pk': self.object.pk})
@@ -58,7 +59,7 @@ class MessageCreateView(CreateView):
 
 class MessageUpdateView(UpdateView):
     model = Message
-    fields = ['subject', 'body']
+    form_class = MessageForm
 
     def get_success_url(self):
         return reverse_lazy('mailing:message_detail', kwargs={'pk': self.object.pk})
@@ -82,7 +83,7 @@ class MailingDetailView(DetailView):
 
 class MailingCreateView(CreateView):
     model = Mailing
-    fields = ['started_date', 'ended_date', 'status', 'message', 'recipients']
+    form_class = MailingForm
 
     def get_success_url(self):
         return reverse_lazy('mailing:mailing_detail', kwargs={'pk': self.object.pk})
@@ -90,7 +91,7 @@ class MailingCreateView(CreateView):
 
 class MailingUpdateView(UpdateView):
     model = Mailing
-    fields = ['started_date', 'ended_date', 'status', 'message', 'recipients']
+    form_class = MailingForm
 
     def get_success_url(self):
         return reverse_lazy('mailing:mailing_detail', kwargs={'pk': self.object.pk})

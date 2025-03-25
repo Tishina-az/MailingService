@@ -1,3 +1,4 @@
+from ckeditor.fields import RichTextField
 from django.db import models
 
 class Recipient(models.Model):
@@ -25,7 +26,7 @@ class Recipient(models.Model):
 
 class Message(models.Model):
     subject = models.CharField(max_length=100, verbose_name='Тема письма')
-    body = models.TextField(verbose_name='Тело письма')
+    body = RichTextField()
 
     def __str__(self):
         return f'{self.subject}'

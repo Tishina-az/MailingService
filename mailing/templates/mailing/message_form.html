@@ -12,6 +12,7 @@
                <div class="card">
                    <div class="card-body">
                       {% csrf_token %}
+                      {{ form.media }}  <!-- Это подключает CSS/JS CKEditor -->
                       {{ form.as_p }}
                       <button type="submit" class="btn btn-primary">Сохранить</button>
                       <a href="{% url 'mailing:message_list' %}" class="btn btn-warning">Отменить</a>
