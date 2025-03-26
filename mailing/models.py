@@ -1,5 +1,5 @@
-from ckeditor.fields import RichTextField
 from django.db import models
+
 
 class Recipient(models.Model):
     email = models.EmailField(unique=True, verbose_name='Email')
@@ -26,7 +26,7 @@ class Recipient(models.Model):
 
 class Message(models.Model):
     subject = models.CharField(max_length=100, verbose_name='Тема письма')
-    body = RichTextField()
+    body = models.TextField(verbose_name='Текст письма')
 
     def __str__(self):
         return f'{self.subject}'

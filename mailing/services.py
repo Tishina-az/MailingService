@@ -18,8 +18,8 @@ def send_mail_to_recipient(mailing, recipient):
         return False
 
 
-def send_mailing(mailing):
-    if mailing.status != mailing.CREATED:
+def send_mailing(mailing, force=False):
+    if mailing.status != mailing.CREATED and not force:
         raise ValueError('Данная рассылка уже запущена либо завершена.')
 
     mailing.status = mailing.LAUNCHED

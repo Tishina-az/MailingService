@@ -130,38 +130,6 @@ argon2 = ["argon2-cffi (>=19.1.0)"]
 bcrypt = ["bcrypt"]
 
 [[package]]
-name = "django-ckeditor"
-version = "6.7.2"
-description = "Django admin CKEditor integration."
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "django_ckeditor-6.7.2-py3-none-any.whl", hash = "sha256:2b3f147ce21eba861db481683e9a4639c11f0ad1f0d37c179003ef07f9eb65a4"},
-    {file = "django_ckeditor-6.7.2.tar.gz", hash = "sha256:a66be4f0ca13924d756e4930260144b31df4164eae8b942ca610f4313df00d5f"},
-]
-
-[package.dependencies]
-Django = ">=3.2"
-django-js-asset = ">=2.0"
-
-[[package]]
-name = "django-js-asset"
-version = "3.1.2"
-description = "script tag with additional attributes for django.forms.Media"
-optional = false
-python-versions = ">=3.10"
-files = [
-    {file = "django_js_asset-3.1.2-py3-none-any.whl", hash = "sha256:b5ffe376aebbd73b7af886d675ac9f43ca63b39540190fa8409c9f8e79145f68"},
-    {file = "django_js_asset-3.1.2.tar.gz", hash = "sha256:1fc7584199ed1941ed7c8e7b87ca5524bb0f2ba941561d2a104e88ee9f07bedd"},
-]
-
-[package.dependencies]
-django = ">=4.2"
-
-[package.extras]
-tests = ["coverage"]
-
-[[package]]
 name = "executing"
 version = "2.2.0"
 description = "Get the currently executing AST node of a frame, and other information"
@@ -721,13 +689,13 @@ test = ["argcomplete (>=3.0.3)", "mypy (>=1.7.0)", "pre-commit", "pytest (>=7.0,
 
 [[package]]
 name = "typing-extensions"
-version = "4.12.2"
+version = "4.13.0"
 description = "Backported and Experimental Type Hints for Python 3.8+"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "typing_extensions-4.12.2-py3-none-any.whl", hash = "sha256:04e5ca0351e0f3f85c6853954072df659d0d13fac324d0072316b67d7794700d"},
-    {file = "typing_extensions-4.12.2.tar.gz", hash = "sha256:1a7ead55c7e559dd4dee8856e3a88b41225abfe1ce8df57b7c13915fe121ffb8"},
+    {file = "typing_extensions-4.13.0-py3-none-any.whl", hash = "sha256:c8dd92cc0d6425a97c18fbb9d1954e5ff92c1ca881a309c45f06ebc0b79058e5"},
+    {file = "typing_extensions-4.13.0.tar.gz", hash = "sha256:0a4ac55a5820789d87e297727d229866c9650f6521b64206413c4fbada24d95b"},
 ]
 
 [[package]]
@@ -755,4 +723,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "6a7e8fabbdfa129a3d3d1c96652d6a1bde7c2514c6dd3c8ba90b5e8d75a130e0"
+content-hash = "376d1366fecdb4d04c6e7b5b694c3c0d3e8752091f9b9682775a88400fc2d46c"
