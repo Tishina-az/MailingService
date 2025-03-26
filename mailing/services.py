@@ -12,8 +12,10 @@ def send_mail_to_recipient(mailing, recipient):
             recipient_list=[recipient.email],
             fail_silently=False,
         )
+        return True
     except Exception as e:
         print(f'Ошибка отправки рассылки для получателя {recipient.email}: {str(e)}.')
+        return False
 
 
 def send_mailing(mailing):
