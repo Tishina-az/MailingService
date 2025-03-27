@@ -110,8 +110,9 @@ class SendMailing(View):
     def post(self, request, pk):
         mailing = get_object_or_404(Mailing, pk=pk)
         try:
-            count = MailingService.send_mailing(request, mailing)
-            messages.success(request, f'Рассылка успешно отправлена! Всего получателей рассылки: {count}.')
+            count = MailingService.send_mailing(mailing)
+            messages.success(request,
+                             f'Рассылка №{pk} успешно отправлена! Получили рассылку: {count} из {mailing.recipients.count()} адресатов.')
         except Exception as e:
             messages.error(request, f'Ошибка при отправке: {str(e)}')
         return redirect(reverse('mailing:mailing_detail', kwargs={'pk': pk}))

@@ -32,7 +32,7 @@ class Command(BaseCommand):
 
             count = MailingService.send_mailing(mailing, force=force)
             self.stdout.write(
-                self.style.SUCCESS(f'Рассылка №{pk} успешно отправлена! Всего получателей рассылки: {count}.'))
+                self.style.SUCCESS(f'Рассылка №{pk} успешно отправлена! Получили рассылку: {count} из {mailing.recipients.count()} адресатов.'))
         except Mailing.objects.model.DoesNotExist:
             self.stderr.write(f"Рассылка №{pk} не найдена.")
         except Exception as e:
