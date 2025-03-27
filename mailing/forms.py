@@ -1,5 +1,4 @@
 from django import forms
-from django.core.exceptions import ValidationError
 from django.db.models import BooleanField
 from django.utils.safestring import mark_safe
 
@@ -56,27 +55,10 @@ class MessageForm(StyleFormMixin, forms.ModelForm):
 class MailingForm(StyleFormMixin, forms.ModelForm):
     class Meta:
         model = Mailing
-        fields = '__all__'
-        # Виджет для удобного ввода даты и времени в форме (с помощью календарика)
-        widgets = {
-            'started_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-            'ended_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-        }
+        exclude = ['started_date', 'ended_date']
 
     def __init__(self, *args, **kwargs):
         super(MailingForm, self).__init__(*args, **kwargs)
-
-        # Проверка существования формы self.instance.pk. Если форма существует,
-        # то дата и время отформатируются для корректного отображения в форме (чтобы не вводить их заново)
-        if self.instance.pk:
-            self.initial['started_date'] = self.instance.started_date.strftime('%Y-%m-%dT%H:%M')
-            self.initial['ended_date'] = self.instance.ended_date.strftime('%Y-%m-%dT%H:%M')
-
-        self.fields['started_date'].help_text = mark_safe(
-            '<small id="photoHelp" class="form-text text-muted">*Введите дату и время в формате: ГГГГ-ММ-ДД, ЧЧ:ММ</small>')
-
-        self.fields['ended_date'].help_text = mark_safe(
-            '<small id="photoHelp" class="form-text text-muted">*Введите дату и время в формате: ГГГГ-ММ-ДД, ЧЧ:ММ</small>')
 
         self.fields['recipients'].help_text = mark_safe(
             '<small id="photoHelp" class="form-text text-muted">*Выберите минимум одного получателя.</small>')
