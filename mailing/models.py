@@ -47,8 +47,8 @@ class Mailing(models.Model):
         (COMPLETED, 'Завершена'),
     ]
 
-    started_date = models.DateTimeField(auto_now=True, verbose_name='Дата и время первой отправки')
-    ended_date = models.DateTimeField(auto_now=True, verbose_name='Дата и время окончания отправки')
+    started_date = models.DateTimeField(null=True, blank=True, verbose_name='Дата и время первой отправки')
+    ended_date = models.DateTimeField(null=True, blank=True, verbose_name='Дата и время окончания отправки')
     status = models.CharField(max_length=9, choices=MAILING_STATUS, default=CREATED, verbose_name='Статус')
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name='mailings', verbose_name='Сообщение')
     recipients = models.ManyToManyField(Recipient, related_name='mailings', verbose_name='Получатели')
@@ -79,7 +79,7 @@ class MailingAttempt(models.Model):
 
     attempt_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата и время попытки')
     status = models.CharField(max_length=14, choices=ATTEMPT_STATUS, verbose_name='Статус попытки')
-    response_mail_server = models.TextField(verbose_name='Ответ почтового сервера')
+    response_mail_server = models.TextField(null=True, blank=True, verbose_name='Ответ почтового сервера')
     mailing = models.ForeignKey(Mailing, on_delete=models.CASCADE, related_name='mailing_attempts', verbose_name='Рассылка')
 
     def __str__(self):

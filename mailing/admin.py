@@ -37,6 +37,6 @@ class MailingAdmin(admin.ModelAdmin):
 @admin.register(MailingAttempt)
 class MailingAttemptAdmin(admin.ModelAdmin):
     list_display = ('attempt_date', 'status', 'response_mail_server', 'mailing',)
-    readonly_fields = ('attempt_date',)
+    readonly_fields = ('attempt_date', 'status', 'response_mail_server', 'mailing',)
     search_fields = ('mailing',)
     list_filter = ('status',)

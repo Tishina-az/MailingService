@@ -6,7 +6,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 
 from mailing.forms import RecipientForm, MessageForm, MailingForm
 from mailing.models import Recipient, Message, Mailing
-from mailing.services import send_mailing
+from mailing.services import MailingService
 
 
 class RecipientListView(ListView):
@@ -110,7 +110,7 @@ class SendMailing(View):
     def post(self, request, pk):
         mailing = get_object_or_404(Mailing, pk=pk)
         try:
-            count = send_mailing(mailing)
+            count = MailingService.send_mailing(request, mailing)
             messages.success(request, f'Рассылка успешно отправлена! Всего получателей рассылки: {count}.')
         except Exception as e:
             messages.error(request, f'Ошибка при отправке: {str(e)}')

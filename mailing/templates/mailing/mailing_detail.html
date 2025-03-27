@@ -8,7 +8,7 @@
         {% if messages %}
         <div class="messages">
             {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">
                 {{ message }}
             </div>
             {% endfor %}
@@ -19,7 +19,7 @@
         <h4 class="fw-normal text-muted mb-3">Статус рассылки: {{ mailing.get_status_display }}</h4>
         <h4 class="fw-normal text-muted mb-3">Старт рассылки: {{ mailing.started_date|date:"d F Yг. H:i:s" }}</h4>
         <h4 class="fw-normal text-muted mb-3">Окончание рассылки: {{ mailing.ended_date|date:"d F Yг. H:i:s" }}</h4>
-        <h3 class="fw-normal mt-5 mb-3">{{ mailing.message.body }}</h3>
+        <h3 class="fw-normal mt-5 mb-3">{{ mailing.message.body|safe }}</h3>
         <h3 class="fw-normal mt-5 mb-3">
             Список получателей рассылки:
             {% for email in mailing.get_recipient_emails %}

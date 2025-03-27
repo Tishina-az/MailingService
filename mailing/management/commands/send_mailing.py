@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 
 from mailing.models import Mailing
-from mailing.services import send_mailing
+from mailing.services import MailingService
 
 
 class Command(BaseCommand):
@@ -30,7 +30,7 @@ class Command(BaseCommand):
                     f'Рассылка №{pk} уже запущена либо завершена. Используйте "--force" для принудительной отправки.'))
                 return
 
-            count = send_mailing(mailing, force=force)
+            count = MailingService.send_mailing(mailing, force=force)
             self.stdout.write(
                 self.style.SUCCESS(f'Рассылка №{pk} успешно отправлена! Всего получателей рассылки: {count}.'))
         except Mailing.objects.model.DoesNotExist:
