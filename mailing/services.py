@@ -1,8 +1,10 @@
+import time
+
 from django.conf import settings
 from django.core.mail import send_mail
 from django.utils import timezone
 
-from mailing.models import MailingAttempt
+from mailing.models import MailingAttempt, Mailing, Recipient
 
 
 class MailingService:
@@ -10,6 +12,7 @@ class MailingService:
     @staticmethod
     def send_mail_to_recipient(mailing, recipient):
         try:
+            time.sleep(5)  # Задержка отправки 5 секунд, для отладки главной страницы
             send_mail(
                 subject=mailing.message.subject,
                 message='',
@@ -57,3 +60,21 @@ class MailingService:
             mailing.status = mailing.CREATED
             mailing.save()
             raise e
+
+
+class MainPageService:
+
+    @staticmethod
+    def get_mailing_count():
+        mailing_count = Mailing.objects.all().count()
+        return  mailing_count
+
+    @staticmethod
+    def get_mailing_launched():
+        mailing_launched = Mailing.objects.filter(status='launched').count()
+        return mailing_launched
+
+    @staticmethod
+    def get_recipients_count():
+        recipients_count = Recipient.objects.all().count()
+        return recipients_count
