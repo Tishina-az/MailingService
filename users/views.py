@@ -82,4 +82,4 @@ class CustomUserUpdate(LoginRequiredMixin, UpdateView):
     model = CustomUser
     template_name = 'users/register.html'
     form_class = CustomUserUpdateForm
-    success_url = reverse_lazy('catalog:products_list')
+    success_url = reverse_lazy('mailing:main_page')
