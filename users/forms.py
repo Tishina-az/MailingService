@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordResetForm, SetPasswordForm
 from django.core.exceptions import ValidationError
 from django.db.models import BooleanField
 from django.utils.safestring import mark_safe
@@ -97,3 +97,17 @@ class CustomUserUpdateForm(StyleFormMixin, UserCreationForm):
             if avatar.size > max_size:
                 raise ValidationError('Размер файла не должен превышать 5 МБ.')
         return avatar
+
+
+class CustomPasswordResetForm(StyleFormMixin, PasswordResetForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['email'].widget.attrs.update({
+            'placeholder': 'Введите ваш email'
+        })
+
+
+class CustomSetPasswordForm(StyleFormMixin, SetPasswordForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)

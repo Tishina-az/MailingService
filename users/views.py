@@ -1,7 +1,8 @@
 import secrets
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, \
+    PasswordResetCompleteView
 from django.core.mail import EmailMultiAlternatives
 from django.shortcuts import get_object_or_404, redirect
 from django.template.loader import render_to_string
@@ -10,7 +11,8 @@ from django.utils.html import strip_tags
 from django.views.generic import CreateView, UpdateView
 
 from config.settings import DEFAULT_FROM_EMAIL
-from users.forms import CustomUserCreationForm, CustomUserLoginForm, CustomUserUpdateForm
+from users.forms import CustomUserCreationForm, CustomUserLoginForm, CustomUserUpdateForm, CustomPasswordResetForm, \
+    CustomSetPasswordForm
 from users.models import CustomUser
 
 
@@ -83,3 +85,25 @@ class CustomUserUpdate(LoginRequiredMixin, UpdateView):
     template_name = 'users/register.html'
     form_class = CustomUserUpdateForm
     success_url = reverse_lazy('mailing:main_page')
+
+
+class CustomPasswordResetView(PasswordResetView):
+    template_name = 'users/password_reset_form.html'
+    email_template_name = 'users/password_reset_email.html'
+    subject_template_name = 'users/password_reset_subject.txt'
+    form_class = CustomPasswordResetForm
+    success_url = reverse_lazy('users:password_reset_done')
+
+
+class CustomPasswordResetDoneView(PasswordResetDoneView):
+    template_name = 'users/password_reset_done.html'
+
+
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    form_class = CustomSetPasswordForm
+    template_name = 'users/password_reset_confirm.html'
+    success_url = reverse_lazy('users:password_reset_complete')
+
+
+class CustomPasswordResetCompleteView(PasswordResetCompleteView):
+    template_name = 'users/password_reset_complete.html'
