@@ -5,7 +5,7 @@ from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 
 from mailing.forms import RecipientForm, MessageForm, MailingForm
-from mailing.models import Recipient, Message, Mailing
+from mailing.models import Recipient, Message, Mailing, MailingAttempt
 from mailing.services import MailingService, MainPageService
 
 
@@ -126,3 +126,10 @@ class MainPageView(TemplateView):
         context['mailing_launched'] = MainPageService.get_mailing_launched()
         context['recipients_count'] = MainPageService.get_recipients_count()
         return context
+
+
+class MailingAttemptListView(ListView):
+    model = MailingAttempt
+    template_name = 'mailing/mailing_attempt_list.html'
+    context_object_name = 'mailing_attempts'
+    paginate_by = 20
