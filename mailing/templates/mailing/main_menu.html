@@ -24,7 +24,7 @@
                         {{ user.email }}
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Личный кабинет</a></li>
+                        <li><a class="dropdown-item" href="{% url 'users:user_profile' user.pk %}">Личный кабинет</a></li>
                         <li><a class="dropdown-item" href="{% url 'users:user_update' user.pk %}">Редактировать
                             профиль</a></li>
                         <li>

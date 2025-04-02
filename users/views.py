@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy, reverse
 from django.utils.html import strip_tags
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView, UpdateView, ListView, DetailView
 
 from config.settings import DEFAULT_FROM_EMAIL
 from users.forms import CustomUserCreationForm, CustomUserLoginForm, CustomUserUpdateForm, CustomPasswordResetForm, \
@@ -78,6 +78,11 @@ class RegisterView(CreateView):
 class CustomLoginView(LoginView):
     template_name = 'users/login.html'
     form_class = CustomUserLoginForm
+
+
+class CustomUserDetailView(LoginRequiredMixin, DetailView):
+    model = CustomUser
+    template_name = 'users/profile.html'
 
 
 class CustomUserUpdate(LoginRequiredMixin, UpdateView):

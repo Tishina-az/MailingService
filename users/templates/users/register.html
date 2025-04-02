@@ -21,7 +21,11 @@
                         {{ form.non_field_errors }}
                         {{ form.as_p }}
                         <button type="submit" class="btn btn-primary">Сохранить</button>
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'users:user_profile' user.pk %}" class="btn btn-warning">Отменить</a>
+                        {% else %}
                         <a href="{% url 'mailing:main_page' %}" class="btn btn-warning">Отменить</a>
+                        {% endif %}
                     </div>
                 </div>
             </form>

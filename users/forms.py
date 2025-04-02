@@ -60,20 +60,16 @@ class CustomUserLoginForm(StyleFormMixin, AuthenticationForm):
     password = forms.CharField(label='Пароль', widget=forms.PasswordInput)
 
 
-class CustomUserUpdateForm(StyleFormMixin, UserCreationForm):
+class CustomUserUpdateForm(StyleFormMixin, forms.ModelForm):
     first_name = forms.CharField(label='Имя')
     last_name = forms.CharField(label='Фамилия')
 
     class Meta:
         model = CustomUser
-        fields = ('first_name', 'last_name', 'avatar', 'email',)
+        fields = ['first_name', 'last_name', 'avatar']
 
     def __init__(self, *args, **kwargs):
         super(CustomUserUpdateForm, self).__init__(*args, **kwargs)
-
-        self.fields['email'].widget.attrs.update({
-            'placeholder': 'Введите ваш email'
-        })
 
         self.fields['first_name'].widget.attrs.update({
             'placeholder': 'Иван'
