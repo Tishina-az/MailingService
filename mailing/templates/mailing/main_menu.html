@@ -10,24 +10,13 @@
                 <li class="nav-item">
                     <a class="nav-link" aria-current="page" href="{% url 'mailing:main_page' %}">Главная</a>
                 </li>
+                <li><a class="nav-link" href="{% url 'mailing:recipient_list' %}">Получатели</a></li>
+                <li><a class="nav-link" href="{% url 'mailing:message_list' %}">Сообщения</a></li>
+                <li><a class="nav-link" href="{% url 'mailing:mailing_list' %}">Рассылки</a></li>
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'mailing:mailing_attempt_list' %}">Попытки рассылок</a>
                 </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                       aria-expanded="false">
-                        Управление рассылкой
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{% url 'mailing:recipient_list' %}">Получатели</a></li>
-                        <li><a class="dropdown-item" href="{% url 'mailing:message_list' %}">Сообщения</a></li>
-                        <li><a class="dropdown-item" href="{% url 'mailing:mailing_list' %}">Рассылки</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item" href="#">Статистика</a></li>
-                    </ul>
-                </li>
+                <li><a class="nav-link" href="#">Статистика</a></li>
                 {% if user.is_authenticated %}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
@@ -36,7 +25,8 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="#">Личный кабинет</a></li>
-                        <li><a class="dropdown-item" href="{% url 'users:user_update' user.pk %}">Редактировать профиль</a></li>
+                        <li><a class="dropdown-item" href="{% url 'users:user_update' user.pk %}">Редактировать
+                            профиль</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>

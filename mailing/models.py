@@ -1,5 +1,7 @@
 from django.db import models
 
+from users.models import CustomUser
+
 
 class Recipient(models.Model):
     email = models.EmailField(unique=True, verbose_name='Email')
@@ -7,6 +9,8 @@ class Recipient(models.Model):
     first_name = models.CharField(max_length=50, verbose_name='Имя')
     middle_name = models.CharField(max_length=50, blank=True, null=True, verbose_name='Отчество')
     comment = models.TextField(blank=True, null=True, verbose_name='Комментарий')
+
+    owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='recipients', verbose_name='Владелец')
 
     def __str__(self):
         return f'{self.full_name} - {self.email}'
@@ -27,6 +31,9 @@ class Recipient(models.Model):
 class Message(models.Model):
     subject = models.CharField(max_length=100, verbose_name='Тема письма')
     body = models.TextField(verbose_name='Текст письма')
+
+    owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='messages', verbose_name='Владелец')
+
 
     def __str__(self):
         return f'{self.subject}'
@@ -52,6 +59,10 @@ class Mailing(models.Model):
     status = models.CharField(max_length=9, choices=MAILING_STATUS, default=CREATED, verbose_name='Статус')
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name='mailings', verbose_name='Сообщение')
     recipients = models.ManyToManyField(Recipient, related_name='mailings', verbose_name='Получатели')
+
+    is_active = models.BooleanField(default=True, verbose_name='Включена/Отключена')
+    owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='mailings', verbose_name='Владелец')
+
 
     def __str__(self):
         return self.status
