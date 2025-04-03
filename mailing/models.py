@@ -5,8 +5,8 @@ from users.models import CustomUser
 
 class Recipient(models.Model):
     email = models.EmailField(verbose_name='Email')
-    last_name = models.CharField(max_length=50, verbose_name='Фамилия')
     first_name = models.CharField(max_length=50, verbose_name='Имя')
+    last_name = models.CharField(max_length=50, verbose_name='Фамилия')
     middle_name = models.CharField(max_length=50, blank=True, null=True, verbose_name='Отчество')
     comment = models.TextField(blank=True, null=True, verbose_name='Комментарий')
 
@@ -25,7 +25,7 @@ class Recipient(models.Model):
     class Meta:
         verbose_name = 'Получатель рассылки'
         verbose_name_plural = 'Получатели рассылки'
-        ordering = ['last_name']
+        ordering = ['pk']
         constraints = [
             models.UniqueConstraint(
                 fields=['email', 'owner'],
@@ -47,6 +47,7 @@ class Message(models.Model):
     class Meta:
         verbose_name = 'Сообщение'
         verbose_name_plural = 'Сообщения'
+        ordering = ['pk']
 
 
 class Mailing(models.Model):
@@ -80,7 +81,7 @@ class Mailing(models.Model):
     class Meta:
         verbose_name = 'Рассылка'
         verbose_name_plural = 'Рассылки'
-        ordering = ['started_date']
+        ordering = ['pk']
 
 
 class MailingAttempt(models.Model):

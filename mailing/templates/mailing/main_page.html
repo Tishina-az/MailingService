@@ -3,11 +3,6 @@
 {% block title %}Главная страница{% endblock %}
 
 {% block content %}
-<nav class="mb-5 text-center">
-    <a class="p-2 btn btn-outline-primary" href="{% url 'mailing:recipient_create' %}">Добавить получателя</a>
-    <a class="p-2 btn btn-outline-primary" href="{% url 'mailing:message_create' %}">Добавить сообщение</a>
-    <a class="p-2 btn btn-outline-primary" href="{% url 'mailing:mailing_create' %}">Добавить рассылку</a>
-</nav>
 <div class="container">
     <h3 class="text-center mb-3">Количество всех рассылок: {{ mailing_count }}</h3>
     <h3 class="text-center mb-3">Количество активных рассылок рассылок: {{ mailing_launched }}</h3>
