@@ -1,4 +1,5 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from django.db.models import BooleanField
 from django.utils.safestring import mark_safe
 
@@ -18,9 +19,10 @@ class StyleFormMixin():
 class RecipientForm(StyleFormMixin, forms.ModelForm):
     class Meta:
         model = Recipient
-        fields = '__all__'
+        exclude = ['owner',]
 
     def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
         super(RecipientForm, self).__init__(*args, **kwargs)
 
         self.fields['email'].widget.attrs.update({
@@ -41,6 +43,18 @@ class RecipientForm(StyleFormMixin, forms.ModelForm):
         self.fields['comment'].widget.attrs.update({
             'placeholder': '...начните писать'
         })
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+
+        owner = getattr(self.instance, 'owner', None)
+        if not owner and hasattr(self, 'request') and self.request:
+            owner = self.request.user
+
+        if owner and Recipient.objects.filter(email=email, owner=owner).exclude(pk=self.instance.pk).exists():
+            raise ValidationError('У вас уже есть получатель с таким email!')
+
+        return email
 
 
 class MessageForm(StyleFormMixin, forms.ModelForm):

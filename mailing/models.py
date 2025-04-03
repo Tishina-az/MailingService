@@ -4,7 +4,7 @@ from users.models import CustomUser
 
 
 class Recipient(models.Model):
-    email = models.EmailField(unique=True, verbose_name='Email')
+    email = models.EmailField(verbose_name='Email')
     last_name = models.CharField(max_length=50, verbose_name='Фамилия')
     first_name = models.CharField(max_length=50, verbose_name='Имя')
     middle_name = models.CharField(max_length=50, blank=True, null=True, verbose_name='Отчество')
@@ -26,6 +26,12 @@ class Recipient(models.Model):
         verbose_name = 'Получатель рассылки'
         verbose_name_plural = 'Получатели рассылки'
         ordering = ['last_name']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['email', 'owner'],
+                name='unique_email_per_owner'
+            )
+        ]
 
 
 class Message(models.Model):

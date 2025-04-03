@@ -1,4 +1,6 @@
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.views import View
@@ -9,37 +11,76 @@ from mailing.models import Recipient, Message, Mailing, MailingAttempt
 from mailing.services import MailingService, MainPageService
 
 
-class RecipientListView(ListView):
+class RecipientListView(LoginRequiredMixin, ListView):
     model = Recipient
     template_name = 'recipient_list'
     context_object_name = 'recipients'
     paginate_by = 10
 
+    def get_queryset(self):
+        if self.request.user.groups.filter(name='Менеджер').exists():
+            return Recipient.objects.all()
+        return Recipient.objects.filter(owner=self.request.user)
 
-class RecipientDetailView(DetailView):
+
+class RecipientCreateView(LoginRequiredMixin, CreateView):
+    model = Recipient
+    form_class = RecipientForm
+
+    def get_success_url(self):
+        return reverse_lazy('mailing:recipient_detail', kwargs={'pk': self.object.pk})
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
+
+class RecipientDetailView(LoginRequiredMixin, DetailView):
     model = Recipient
     context_object_name = 'recipient'
 
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        if obj.owner != self.request.user:
+            raise PermissionDenied('У вас не достаточно прав для просмотра данной страницы.')
+        return obj
 
-class RecipientCreateView(CreateView):
+
+class RecipientUpdateView(LoginRequiredMixin, UpdateView):
     model = Recipient
     form_class = RecipientForm
 
     def get_success_url(self):
         return reverse_lazy('mailing:recipient_detail', kwargs={'pk': self.object.pk})
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
 
-class RecipientUpdateView(UpdateView):
-    model = Recipient
-    form_class = RecipientForm
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
 
-    def get_success_url(self):
-        return reverse_lazy('mailing:recipient_detail', kwargs={'pk': self.object.pk})
+        if obj.owner != self.request.user:
+            raise PermissionDenied('У вас не достаточно прав для редактирования данного клиента.')
+        return obj
 
 
-class RecipientDeleteView(DeleteView):
+class RecipientDeleteView(LoginRequiredMixin, DeleteView):
     model = Recipient
     success_url = reverse_lazy('mailing:recipient_list')
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+
+        if obj.owner != self.request.user:
+            raise PermissionDenied('У вас не достаточно прав для удаления данного клиента.')
+        return obj
 
 
 class MessageListView(ListView):

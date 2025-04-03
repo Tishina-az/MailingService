@@ -7,7 +7,7 @@ from mailing.models import Recipient, Message, Mailing, MailingAttempt
 @admin.register(Recipient)
 class RecipientAdmin(admin.ModelAdmin):
     list_display = ('full_name', 'email', 'comment',)
-    readonly_fields = ('full_name',)
+    readonly_fields = ('full_name', 'owner',)
     search_fields = ('full_name',)
 
 
