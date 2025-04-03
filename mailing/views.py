@@ -46,7 +46,8 @@ class RecipientDetailView(LoginRequiredMixin, DetailView):
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
-        if obj.owner != self.request.user:
+
+        if not (obj.owner == self.request.user or self.request.user.has_perm('mailing.view_recipient')):
             raise PermissionDenied('У вас не достаточно прав для просмотра данной страницы.')
         return obj
 
@@ -100,7 +101,7 @@ class MessageDetailView(LoginRequiredMixin, DetailView):
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
-        if obj.owner != self.request.user:
+        if not (obj.owner == self.request.user or self.request.user.has_perm('mailing.view_recipient')):
             raise PermissionDenied('У вас не достаточно прав для просмотра данной страницы.')
         return obj
 
@@ -161,7 +162,7 @@ class MailingDetailView(LoginRequiredMixin, DetailView):
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
-        if obj.owner != self.request.user:
+        if not (obj.owner == self.request.user or self.request.user.has_perm('mailing.view_recipient')):
             raise PermissionDenied('У вас не достаточно прав для просмотра данной страницы.')
         return obj
 

@@ -30,21 +30,23 @@
             <a class="btn btn-primary" href="{% url 'mailing:mailing_list' %}">
                 К списку рассылок
             </a>
-            {% if mailing.status == mailing.CREATED %}
-            <!-- Запуск рассылки вручную -->
-            <form method="post" action="{% url 'mailing:mailing_send' mailing.pk %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-success">
-                    Отправить рассылку
-                </button>
-            </form>
+            {% if user == mailing.owner %}
+                {% if mailing.status == mailing.CREATED %}
+                    <!-- Запуск рассылки вручную -->
+                    <form method="post" action="{% url 'mailing:mailing_send' mailing.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success">
+                            Отправить рассылку
+                        </button>
+                    </form>
+                {% endif %}
+                <a class="btn btn-warning" href="{% url 'mailing:mailing_update' mailing.pk %}">
+                    Редактировать
+                </a>
+                <a class="btn btn-danger" href="{% url 'mailing:mailing_delete' mailing.pk %}">
+                    Удалить
+                </a>
             {% endif %}
-            <a class="btn btn-warning" href="{% url 'mailing:mailing_update' mailing.pk %}">
-                Редактировать
-            </a>
-            <a class="btn btn-danger" href="{% url 'mailing:mailing_delete' mailing.pk %}">
-                Удалить
-            </a>
         </div>
     </div>
     <div class="product-device shadow-sm d-none d-md-block"></div>

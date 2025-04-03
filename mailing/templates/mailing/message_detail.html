@@ -8,18 +8,17 @@
         <h1 class="display-3 fw-bold mb-5">{{ message.subject }}</h1>
         <h3 class="fw-normal text-muted mb-3">{{ message.body|safe }}</h3>  <!-- HTML-контент рендерится корректно -->
         <div class="d-flex gap-3 justify-content-center lead fw-normal mt-5">
-            <a class="icon-link" href="{% url 'mailing:message_list' %}">
+            <a class="btn btn-primary" href="{% url 'mailing:message_list' %}">
                 К списку сообщений
-                <svg class="bi"><use xlink:href="#chevron-right"/></svg>
             </a>
-            <a class="icon-link" href="{% url 'mailing:message_update' message.pk %}">
-                Редактировать
-                <svg class="bi"><use xlink:href="#chevron-right"/></svg>
-            </a>
-            <a class="icon-link" href="{% url 'mailing:message_delete' message.pk %}">
-                Удалить
-                <svg class="bi"><use xlink:href="#chevron-right"/></svg>
-            </a>
+            {% if user == message.owner %}
+                <a class="btn btn-warning" href="{% url 'mailing:message_update' message.pk %}">
+                    Редактировать
+                </a>
+                <a class="btn btn-danger" href="{% url 'mailing:message_delete' message.pk %}">
+                    Удалить
+                </a>
+            {% endif %}
         </div>
     </div>
     <div class="product-device shadow-sm d-none d-md-block"></div>

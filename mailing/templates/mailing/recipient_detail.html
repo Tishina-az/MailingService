@@ -8,19 +8,18 @@
         <h1 class="display-3 fw-bold">{{ recipient.full_name }}</h1>
         <a class="link-opacity-75-hover" href="mailto: {{ recipient.email }}">{{ recipient.email }}</a>
         <h3 class="fw-normal text-muted mb-3">{{ recipient.comment }}</h3>
-        <div class="d-flex gap-3 justify-content-center lead fw-normal">
-            <a class="icon-link" href="{% url 'mailing:recipient_list' %}">
+        <div class="d-flex gap-3 justify-content-center lead fw-normal mt-5">
+            <a class="btn btn-primary" href="{% url 'mailing:recipient_list' %}">
                 К списку получателей
-                <svg class="bi"><use xlink:href="#chevron-right"/></svg>
             </a>
-            <a class="icon-link" href="{% url 'mailing:recipient_update' recipient.pk %}">
-                Редактировать
-                <svg class="bi"><use xlink:href="#chevron-right"/></svg>
-            </a>
-            <a class="icon-link" href="{% url 'mailing:recipient_delete' recipient.pk %}">
-                Удалить
-                <svg class="bi"><use xlink:href="#chevron-right"/></svg>
-            </a>
+            {% if user == recipient.owner %}
+                <a class="btn btn-warning" href="{% url 'mailing:recipient_update' recipient.pk %}">
+                    Редактировать
+                </a>
+                <a class="btn btn-danger" href="{% url 'mailing:recipient_delete' recipient.pk %}">
+                    Удалить
+                </a>
+            {% endif %}
         </div>
     </div>
     <div class="product-device shadow-sm d-none d-md-block"></div>
