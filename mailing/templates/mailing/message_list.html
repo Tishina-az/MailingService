@@ -15,16 +15,22 @@
                     <th scope="col">#</th>
                     <th scope="col">Тема письма</th>
                     <th scope="col">Тело письма</th>
+                    {% if perms.mailing.view_message %}
+                        <th scope="col">Владелец</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody class="table-group-divider">
-                {% for message in messages %}
+            {% for message in messages %}
                 <tr onclick="window.location='{% url 'mailing:message_detail' message.pk %}';" style="cursor: pointer;">
-                    <th class="col-1" scope="row">{{ message.id }}</th>
-                    <td class="col-3">{{ message.subject }}</td>
-                    <td class="col-8">{{ message.body|truncatechars:200 }}</td>
+                    <th class="col" scope="row">{{ message.id }}</th>
+                    <td class="col">{{ message.subject }}</td>
+                    <td class="col">{{ message.body|truncatechars:200 }}</td>
+                    {% if perms.mailing.view_message %}
+                        <td class="col">{{ message.owner.get_full_name }}</td>
+                    {% endif %}
                 </tr>
-                {% endfor %}
+            {% endfor %}
             </tbody>
         </table>
     </div>

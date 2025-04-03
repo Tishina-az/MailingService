@@ -16,6 +16,9 @@
                     <th scope="col">Ф.И.О.</th>
                     <th scope="col">Email</th>
                     <th scope="col">Комментарий</th>
+                    {% if perms.mailing.view_recipient %}
+                        <th scope="col">Владелец</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody class="table-group-divider">
@@ -27,6 +30,9 @@
                         <a class="link-opacity-75-hover" href="mailto: {{ recipient.email }}" onclick="event.stopPropagation();">{{ recipient.email }}</a>
                     </td>
                     <td>{{ recipient.comment|truncatechars:100 }}</td>
+                    {% if perms.mailing.view_recipient %}
+                        <td>{{ recipient.owner.get_full_name }}</td>
+                    {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>
