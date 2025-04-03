@@ -60,7 +60,7 @@ class RecipientForm(StyleFormMixin, forms.ModelForm):
 class MessageForm(StyleFormMixin, forms.ModelForm):
     class Meta:
         model = Message
-        fields = '__all__'
+        exclude = ['owner', ]
         labels = {
             'body': 'Содержание письма'
         }
@@ -69,10 +69,22 @@ class MessageForm(StyleFormMixin, forms.ModelForm):
 class MailingForm(StyleFormMixin, forms.ModelForm):
     class Meta:
         model = Mailing
-        exclude = ['started_date', 'ended_date']
+        fields = ['message', 'recipients']
 
     def __init__(self, *args, **kwargs):
         super(MailingForm, self).__init__(*args, **kwargs)
+
+        self.fields['recipients'].help_text = mark_safe(
+            '<small id="photoHelp" class="form-text text-muted">*Выберите минимум одного получателя.</small>')
+
+
+class MailingUpdateForm(StyleFormMixin, forms.ModelForm):
+    class Meta:
+        model = Mailing
+        fields = ['status', 'message', 'recipients',]
+
+    def __init__(self, *args, **kwargs):
+        super(MailingUpdateForm, self).__init__(*args, **kwargs)
 
         self.fields['recipients'].help_text = mark_safe(
             '<small id="photoHelp" class="form-text text-muted">*Выберите минимум одного получателя.</small>')

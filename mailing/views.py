@@ -6,7 +6,7 @@ from django.urls import reverse_lazy, reverse
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 
-from mailing.forms import RecipientForm, MessageForm, MailingForm
+from mailing.forms import RecipientForm, MessageForm, MailingForm, MailingUpdateForm
 from mailing.models import Recipient, Message, Mailing, MailingAttempt
 from mailing.services import MailingService, MainPageService
 
@@ -90,8 +90,8 @@ class MessageListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         if self.request.user.groups.filter(name='Менеджер').exists():
-            return Recipient.objects.all()
-        return Recipient.objects.filter(owner=self.request.user)
+            return Message.objects.all()
+        return Message.objects.filter(owner=self.request.user)
 
 
 class MessageDetailView(LoginRequiredMixin, DetailView):
@@ -151,8 +151,8 @@ class MailingListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         if self.request.user.groups.filter(name='Менеджер').exists():
-            return Recipient.objects.all()
-        return Recipient.objects.filter(owner=self.request.user)
+            return Mailing.objects.all()
+        return Mailing.objects.filter(owner=self.request.user)
 
 
 class MailingDetailView(LoginRequiredMixin, DetailView):
@@ -172,6 +172,13 @@ class MailingCreateView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse_lazy('mailing:mailing_detail', kwargs={'pk': self.object.pk})
+    
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+
+        form.fields['message'].queryset = Message.objects.filter(owner=self.request.user)
+        form.fields['recipients'].queryset = Recipient.objects.filter(owner=self.request.user)
+        return form
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
@@ -180,7 +187,7 @@ class MailingCreateView(LoginRequiredMixin, CreateView):
 
 class MailingUpdateView(LoginRequiredMixin, UpdateView):
     model = Mailing
-    form_class = MailingForm
+    form_class = MailingUpdateForm
 
     def get_success_url(self):
         return reverse_lazy('mailing:mailing_detail', kwargs={'pk': self.object.pk})
@@ -208,13 +215,16 @@ class MailingDeleteView(LoginRequiredMixin, DeleteView):
 class SendMailing(LoginRequiredMixin, View):
     def post(self, request, pk):
         mailing = get_object_or_404(Mailing, pk=pk)
-        try:
-            count = MailingService.send_mailing(mailing)
-            messages.success(request,
-                             f'Рассылка №{pk} успешно отправлена! Получили рассылку: {count} из {mailing.recipients.count()} адресатов.')
-        except Exception as e:
-            messages.error(request, f'Ошибка при отправке: {str(e)}')
-        return redirect(reverse('mailing:mailing_detail', kwargs={'pk': pk}))
+        if mailing.owner == self.request.user:
+            try:
+                count = MailingService.send_mailing(mailing)
+                messages.success(request,
+                                 f'Рассылка №{pk} успешно отправлена! Получили рассылку: {count} из {mailing.recipients.count()} адресатов.')
+            except Exception as e:
+                messages.error(request, f'Ошибка при отправке: {str(e)}')
+            return redirect(reverse('mailing:mailing_detail', kwargs={'pk': pk}))
+        else:
+            raise PermissionDenied('У вас не достаточно прав для отправки данной рассылки.')
 
 
 class MainPageView(TemplateView):
