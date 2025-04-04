@@ -106,4 +106,4 @@ class MailingAttempt(models.Model):
     class Meta:
         verbose_name = 'Попытка рассылки'
         verbose_name_plural = 'Попытки рассылки'
-        ordering = ['attempt_date']
+        ordering = ['-attempt_date']

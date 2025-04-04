@@ -42,7 +42,8 @@ class MailingService:
         if mailing.status != mailing.CREATED and not force:
             raise ValueError('Данная рассылка уже запущена либо завершена.')
 
-        mailing.started_date = timezone.now()
+        if not  mailing.started_date:
+            mailing.started_date = timezone.now()
         mailing.status = mailing.LAUNCHED
         mailing.save()
 
