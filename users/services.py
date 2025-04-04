@@ -49,5 +49,5 @@ class UserService:
         user.is_active = True
         user.save()
 
-        request.send_welcome_email(user.email)
+        UserService.send_welcome_email(user.email)
         return redirect(reverse('users:login'))
