@@ -213,7 +213,7 @@ class MailingDeleteView(LoginRequiredMixin, DeleteView):
         return obj
 
 
-class SendMailing(LoginRequiredMixin, View):
+class SendMailingView(LoginRequiredMixin, View):
     def post(self, request, pk):
         mailing = get_object_or_404(Mailing, pk=pk)
         if mailing.owner == self.request.user:

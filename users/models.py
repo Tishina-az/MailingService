@@ -40,6 +40,10 @@ class CustomUser(AbstractUser):
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"
         ordering = ['last_name']
+        permissions = [
+            ('can_block_user', 'Can block user'),
+            ('can_unblock_user', 'Can unblock user'),
+        ]
 
     def __str__(self):
         return self.email
