@@ -3,7 +3,8 @@ from django.urls import path
 
 from users.services import UserService
 from users.views import RegisterView, CustomLoginView, CustomUserUpdate, CustomPasswordResetView, \
-    CustomPasswordResetDoneView, CustomPasswordResetConfirmView, CustomPasswordResetCompleteView, CustomUserDetailView
+    CustomPasswordResetDoneView, CustomPasswordResetConfirmView, CustomPasswordResetCompleteView, CustomUserDetailView, \
+    CustomUserListView
 
 app_name = 'users'
 
@@ -14,6 +15,8 @@ urlpatterns = [
     path('confirm/<str:token>/', UserService.email_verification, name='confirm'),
     path('user/update/<int:pk>/', CustomUserUpdate.as_view(), name='user_update'),
     path('user/profile/<int:pk>/', CustomUserDetailView.as_view(), name='user_profile'),
+
+    path('users/', CustomUserListView.as_view(), name='users_list'),
 
     path('password_reset/', CustomPasswordResetView.as_view(), name='password_reset'),
     path('password_reset/done/', CustomPasswordResetDoneView.as_view(), name='password_reset_done'),

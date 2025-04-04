@@ -1,11 +1,11 @@
 import secrets
 
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.views import LoginView, PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, \
     PasswordResetCompleteView
 
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, UpdateView, DetailView
+from django.views.generic import CreateView, UpdateView, DetailView, ListView
 
 from users.forms import CustomUserCreationForm, CustomUserLoginForm, CustomUserUpdateForm, CustomPasswordResetForm, \
     CustomSetPasswordForm
@@ -67,3 +67,11 @@ class CustomPasswordResetConfirmView(PasswordResetConfirmView):
 
 class CustomPasswordResetCompleteView(PasswordResetCompleteView):
     template_name = 'users/password_reset_complete.html'
+
+
+class CustomUserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    model = CustomUser
+    template_name = 'users/users_list.html'
+    context_object_name = 'users'
+    permission_required = 'users.view_customuser'
+    paginate_by = 20
