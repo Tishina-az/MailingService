@@ -42,7 +42,7 @@
                             Заблокировать
                         </button>
                     </td>
-                    {% elif perms.users.can_block_user and not user.is_active %}
+                    {% elif perms.users.can_unblock_user and not user.is_active %}
                     <td>
                         <button class="btn btn-outline-success" onclick="showConfirmModal(
                                 '{% url 'users:user_unblock' user.pk %}',

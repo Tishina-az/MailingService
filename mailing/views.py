@@ -213,6 +213,30 @@ class MailingDeleteView(LoginRequiredMixin, DeleteView):
         return obj
 
 
+class DisableMailingView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        disable_mailing = get_object_or_404(Mailing, pk=pk)
+
+        if self.request.user.has_perm('mailing.can_disable_mailing'):
+            disable_mailing.is_active = False
+            disable_mailing.save()
+            return redirect(reverse('mailing:mailing_list'))
+        else:
+            raise PermissionDenied('У вас не достаточно прав для отключения рассылки.')
+
+
+class EnableMailingView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        disable_mailing = get_object_or_404(Mailing, pk=pk)
+
+        if self.request.user.has_perm('mailing.can_enable_mailing'):
+            disable_mailing.is_active = True
+            disable_mailing.save()
+            return redirect(reverse('mailing:mailing_list'))
+        else:
+            raise PermissionDenied('У вас не достаточно прав для включения рассылки.')
+
+
 class SendMailingView(LoginRequiredMixin, View):
     def post(self, request, pk):
         mailing = get_object_or_404(Mailing, pk=pk)

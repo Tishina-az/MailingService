@@ -21,6 +21,9 @@
                     {% if perms.mailing.view_mailing %}
                         <th scope="col">Владелец</th>
                     {% endif %}
+                    {% if perms.mailing.can_disable_mailing %}
+                        <th scope="col">Отключение/Включение</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody class="table-group-divider">
@@ -38,6 +41,23 @@
                     </td>
                     {% if perms.mailing.view_mailing %}
                         <td class="col">{{ mailing.owner.get_full_name }}</td>
+                    {% endif %}
+                    {% if perms.mailing.can_disable_mailing and mailing.is_active %}
+                    <td>
+                        <button class="btn btn-outline-danger" onclick="event.stopPropagation(); showConfirmModal(
+                                '{% url 'mailing:mailing_disable' mailing.pk %}',
+                                'Отключить рассылку {{ mailing.message|truncatechars:20 }}?')">
+                            Отключить
+                        </button>
+                    </td>
+                    {% elif perms.mailing.can_enable_mailing and not mailing.is_active %}
+                    <td>
+                        <button class="btn btn-outline-success" onclick="event.stopPropagation(); showConfirmModal(
+                                '{% url 'mailing:mailing_enable' mailing.pk %}',
+                                'Включить рассылку {{ mailing.message|truncatechars:20 }}?')">
+                            Включить
+                        </button>
+                    </td>
                     {% endif %}
                 </tr>
                 {% endfor %}
@@ -71,4 +91,6 @@
         </ul>
     </nav>
 </div>
+{% include 'users/modal_script.html' %}
+{% include 'users/modal_confirm.html' %}
 {% endblock %}
