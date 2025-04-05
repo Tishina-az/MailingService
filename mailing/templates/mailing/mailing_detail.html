@@ -26,7 +26,7 @@
             <a class="link-opacity-75-hover" href="mailto: {{ email }}" onclick="event.stopPropagation();">{{ email }}</a>
             {% endfor %}
         </h3>
-        <div class="d-flex gap-3 justify-content-center lead fw-normal mt-5">
+        <div class="d-flex gap-3 justify-content-center lead fw-normal mt-5 mb-2">
             <a class="btn btn-primary" href="{% url 'mailing:mailing_list' %}">
                 К списку рассылок
             </a>
@@ -48,6 +48,10 @@
                 </a>
             {% endif %}
         </div>
+        <small id="mailingHelp" class="text-muted">
+            *Для повторной отправки данной рассылки нажмите кнопку "Редактировать" и измените статус на "Создано".
+            <p>После чего появиться кнопка "Отправить рассылку".</p>
+        </small>
     </div>
     <div class="product-device shadow-sm d-none d-md-block"></div>
     <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>

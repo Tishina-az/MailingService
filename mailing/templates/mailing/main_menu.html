@@ -17,7 +17,7 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'mailing:mailing_attempt_list' %}">Попытки рассылок</a>
                 </li>
-                <li><a class="nav-link" href="#">Статистика</a></li>
+                <li><a class="nav-link" href="{% url 'mailing:statistics' %}">Статистика</a></li>
                     {% if perms.users.view_customuser %}
                     <li><a class="nav-link" href="{% url 'users:users_list' %}">Пользователи</a></li>
                     {% endif %}

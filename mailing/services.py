@@ -2,6 +2,7 @@ import time
 
 from django.conf import settings
 from django.core.mail import send_mail
+from django.db.models import Sum
 from django.utils import timezone
 
 from mailing.models import MailingAttempt, Mailing, Recipient
@@ -54,6 +55,7 @@ class MailingService:
                     success_count += 1
             mailing.ended_date = timezone.now()
             mailing.status = mailing.COMPLETED
+            mailing.send_messages += 1
             mailing.save()
             return success_count
         except Exception as e:
@@ -63,7 +65,7 @@ class MailingService:
             raise e
 
 
-class MainPageService:
+class StatisticsService:
 
     @staticmethod
     def get_mailing_count():
@@ -77,5 +79,17 @@ class MainPageService:
 
     @staticmethod
     def get_recipients_count():
-        recipients_count = Recipient.objects.all().count()
+        recipients_count = Recipient.objects.values('email').distinct().count()
         return recipients_count
+
+    @staticmethod
+    def count_successfully_attempt(user):
+        return MailingAttempt.objects.filter(mailing__owner=user, status=MailingAttempt.SUCCESSFULLY).count()
+
+    @staticmethod
+    def count_unsuccessfully_attempt(user):
+        return MailingAttempt.objects.filter(mailing__owner=user, status=MailingAttempt.UNSUCCESSFULLY).count()
+
+    @staticmethod
+    def count_send_messages(user):
+        return Mailing.objects.filter(owner=user).aggregate(total_sent=Sum('send_messages'))

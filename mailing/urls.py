@@ -6,7 +6,7 @@ from mailing.apps import MailingConfig
 from mailing.views import RecipientListView, RecipientDetailView, RecipientCreateView, RecipientDeleteView, \
     RecipientUpdateView, MessageListView, MessageDetailView, MessageCreateView, MessageUpdateView, MessageDeleteView, \
     MailingListView, MailingDetailView, MailingCreateView, MailingUpdateView, MailingDeleteView, SendMailingView, \
-    MainPageView, MailingAttemptListView, DisableMailingView, EnableMailingView
+    MainPageView, MailingAttemptListView, DisableMailingView, EnableMailingView, StatisticsView
 
 app_name = MailingConfig.name
 
@@ -34,6 +34,7 @@ urlpatterns = [
     path('mailings/mailing_enable/<int:pk>/', EnableMailingView.as_view(), name='mailing_enable'),
 
     path('mailing_attempt/', MailingAttemptListView.as_view(), name='mailing_attempt_list'),
+    path('statistics/', StatisticsView.as_view(), name='statistics'),
 ]
 
 if settings.DEBUG:
