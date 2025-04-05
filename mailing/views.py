@@ -153,7 +153,7 @@ class MailingListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         if self.request.user.groups.filter(name='Менеджер').exists():
             return Mailing.objects.all()
-        return Mailing.objects.filter(owner=self.request.user)
+        return Mailing.objects.filter(owner=self.request.user, is_active=True)
 
 
 class MailingDetailView(LoginRequiredMixin, DetailView):
@@ -268,5 +268,5 @@ class MailingAttemptListView(LoginRequiredMixin, ListView):
     context_object_name = 'mailing_attempts'
     paginate_by = 20
 
-    # def get_queryset(self):
-    #     return MailingAttempt.objects.filter(self.mailing.owner==self.request.user)
+    def get_queryset(self):
+        return MailingAttempt.objects.filter(mailing__owner=self.request.user).select_related('mailing')
