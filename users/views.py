@@ -7,7 +7,9 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect
 
 from django.urls import reverse_lazy, reverse
+from django.utils.decorators import method_decorator
 from django.views import View
+from django.views.decorators.cache import cache_page
 from django.views.generic import CreateView, UpdateView, DetailView, ListView
 
 from users.forms import CustomUserCreationForm, CustomUserLoginForm, CustomUserUpdateForm, CustomPasswordResetForm, \
@@ -38,6 +40,7 @@ class CustomLoginView(LoginView):
     form_class = CustomUserLoginForm
 
 
+@method_decorator(cache_page(60 * 15), name='dispatch')
 class CustomUserDetailView(LoginRequiredMixin, DetailView):
     model = CustomUser
     template_name = 'users/profile.html'
@@ -88,7 +91,7 @@ class BlockUserView(LoginRequiredMixin, View):
             raise PermissionDenied('Вы не можете заблокировать самого себя!')
 
         if self.request.user.has_perm('users.can_block_user'):
-            user_block.is_active=False
+            user_block.is_active = False
             user_block.save()
             return redirect(reverse('users:users_list'))
         else:
@@ -103,7 +106,7 @@ class UnBlockUserView(LoginRequiredMixin, View):
             raise PermissionDenied('Вы не можете заблокировать самого себя!')
 
         if self.request.user.has_perm('users.can_unblock_user'):
-            user_unblock.is_active=True
+            user_unblock.is_active = True
             user_unblock.save()
             return redirect(reverse('users:users_list'))
         else:

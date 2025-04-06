@@ -1,10 +1,12 @@
 import time
 
 from django.conf import settings
+from django.core.cache import cache
 from django.core.mail import send_mail
 from django.db.models import Sum
 from django.utils import timezone
 
+from config.settings import CACHE_ENABLED
 from mailing.models import MailingAttempt, Mailing, Recipient
 
 
@@ -43,7 +45,7 @@ class MailingService:
         if mailing.status != mailing.CREATED and not force:
             raise ValueError('Данная рассылка уже запущена либо завершена.')
 
-        if not  mailing.started_date:
+        if not mailing.started_date:
             mailing.started_date = timezone.now()
         mailing.status = mailing.LAUNCHED
         mailing.save()
@@ -64,13 +66,26 @@ class MailingService:
             mailing.save()
             raise e
 
+    @staticmethod
+    def get_recipients_list():
+        if not CACHE_ENABLED:
+            return Recipient.objects.all()
+
+        key = 'recipients_list'
+        recipients = cache.get(key)
+        if not recipients:
+            recipients = Recipient.objects.all()
+            cache.set(key, recipients)
+            return recipients
+        return recipients
+
 
 class StatisticsService:
 
     @staticmethod
     def get_mailing_count():
         mailing_count = Mailing.objects.all().count()
-        return  mailing_count
+        return mailing_count
 
     @staticmethod
     def get_mailing_launched():

@@ -1,10 +1,11 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
-from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
+from django.utils.decorators import method_decorator
 from django.views import View
+from django.views.decorators.cache import cache_page
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 
 from mailing.forms import RecipientForm, MessageForm, MailingForm, MailingUpdateForm
@@ -20,8 +21,8 @@ class RecipientListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         if self.request.user.groups.filter(name='Менеджер').exists():
-            return Recipient.objects.all()
-        return Recipient.objects.filter(owner=self.request.user)
+            return MailingService.get_recipients_list()
+        return MailingService.get_recipients_list().filter(owner=self.request.user)
 
 
 class RecipientCreateView(LoginRequiredMixin, CreateView):
@@ -41,6 +42,7 @@ class RecipientCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
+@method_decorator(cache_page(60*15), name='dispatch')
 class RecipientDetailView(LoginRequiredMixin, DetailView):
     model = Recipient
     context_object_name = 'recipient'
@@ -96,6 +98,7 @@ class MessageListView(LoginRequiredMixin, ListView):
         return Message.objects.filter(owner=self.request.user)
 
 
+@method_decorator(cache_page(60*15), name='dispatch')
 class MessageDetailView(LoginRequiredMixin, DetailView):
     model = Message
     context_object_name = 'message'
@@ -157,6 +160,7 @@ class MailingListView(LoginRequiredMixin, ListView):
         return Mailing.objects.filter(owner=self.request.user, is_active=True)
 
 
+@method_decorator(cache_page(60*15), name='dispatch')
 class MailingDetailView(LoginRequiredMixin, DetailView):
     model = Mailing
     context_object_name = 'mailing'
@@ -174,7 +178,7 @@ class MailingCreateView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse_lazy('mailing:mailing_detail', kwargs={'pk': self.object.pk})
-    
+
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
 
@@ -262,6 +266,7 @@ class SendMailingView(LoginRequiredMixin, View):
 
 class MainPageView(TemplateView):
     template_name = 'mailing/main_page.html'
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['mailing_count'] = StatisticsService.get_mailing_count()
@@ -282,6 +287,7 @@ class MailingAttemptListView(LoginRequiredMixin, ListView):
 
 class StatisticsView(LoginRequiredMixin, TemplateView):
     template_name = 'mailing/statistics.html'
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
