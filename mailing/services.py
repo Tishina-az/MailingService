@@ -107,4 +107,5 @@ class StatisticsService:
 
     @staticmethod
     def count_send_messages(user):
-        return Mailing.objects.filter(owner=user).aggregate(total_sent=Sum('send_messages'))
+        count = Mailing.objects.filter(owner=user).aggregate(total_sent=Sum('send_messages'))
+        return count['total_sent'] or 0
