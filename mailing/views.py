@@ -14,48 +14,56 @@ from mailing.services import MailingService, StatisticsService
 
 
 class RecipientListView(LoginRequiredMixin, ListView):
+    """Представление для отображения списка получателей рассылки."""
     model = Recipient
     template_name = "recipient_list"
     context_object_name = "recipients"
     paginate_by = 10
 
     def get_queryset(self):
+        """Возвращает queryset получателей в зависимости от роли пользователя."""
         if self.request.user.groups.filter(name="Менеджер").exists():
             return MailingService.get_recipients_list()
         return MailingService.get_recipients_list().filter(owner=self.request.user)
 
 
 class RecipientCreateView(LoginRequiredMixin, CreateView):
+    """Представление для создания нового получателя."""
     model = Recipient
     form_class = RecipientForm
 
     def get_success_url(self):
+        """Возвращает URL для перенаправления после успешного создания."""
         return reverse_lazy("mailing:recipient_detail", kwargs={"pk": self.object.pk})
 
     def get_form_kwargs(self):
+        """Добавляет request в kwargs формы."""
         kwargs = super().get_form_kwargs()
         kwargs["request"] = self.request
         return kwargs
 
     def form_valid(self, form):
+        """Устанавливает владельца получателя перед сохранением."""
         form.instance.owner = self.request.user
         return super().form_valid(form)
 
 
 @method_decorator(cache_page(60 * 15), name="dispatch")
 class RecipientDetailView(LoginRequiredMixin, DetailView):
+    """Представление для детального просмотра получателя с кэшированием на 15 минут."""
     model = Recipient
     context_object_name = "recipient"
 
     def get_object(self, queryset=None):
+        """Проверяет права доступа к получателю."""
         obj = super().get_object(queryset)
-
         if not (obj.owner == self.request.user or self.request.user.has_perm("mailing.view_recipient")):
             raise PermissionDenied("У вас не достаточно прав для просмотра данной страницы.")
         return obj
 
 
 class RecipientUpdateView(LoginRequiredMixin, UpdateView):
+    """Представление для редактирования получателя."""
     model = Recipient
     form_class = RecipientForm
 
@@ -68,31 +76,34 @@ class RecipientUpdateView(LoginRequiredMixin, UpdateView):
         return kwargs
 
     def form_valid(self, form):
+        """Проверяет права на редактирование перед сохранением."""
         obj = self.get_object()
-
         if obj.owner != self.request.user:
             raise PermissionDenied("У вас не достаточно прав для редактирования данного клиента.")
         return super().form_valid(form)
 
 
 class RecipientDeleteView(LoginRequiredMixin, DeleteView):
+    """Представление для удаления получателя."""
     model = Recipient
     success_url = reverse_lazy("mailing:recipient_list")
 
     def get_object(self, queryset=None):
+        """Проверяет права на удаление."""
         obj = super().get_object(queryset)
-
         if obj.owner != self.request.user:
             raise PermissionDenied("У вас не достаточно прав для удаления данного клиента.")
         return obj
 
 
 class MessageListView(LoginRequiredMixin, ListView):
+    """Представление для списка сообщений."""
     model = Message
     context_object_name = "messages"
     paginate_by = 10
 
     def get_queryset(self):
+        """Фильтрует сообщения по правам доступа."""
         if self.request.user.groups.filter(name="Менеджер").exists():
             return Message.objects.all()
         return Message.objects.filter(owner=self.request.user)
@@ -100,6 +111,7 @@ class MessageListView(LoginRequiredMixin, ListView):
 
 @method_decorator(cache_page(60 * 15), name="dispatch")
 class MessageDetailView(LoginRequiredMixin, DetailView):
+    """Просмотр дельной информации о сообщении с кэшированием."""
     model = Message
     context_object_name = "message"
 
@@ -111,6 +123,7 @@ class MessageDetailView(LoginRequiredMixin, DetailView):
 
 
 class MessageCreateView(LoginRequiredMixin, CreateView):
+    """Создание нового сообщения."""
     model = Message
     form_class = MessageForm
 
@@ -123,6 +136,7 @@ class MessageCreateView(LoginRequiredMixin, CreateView):
 
 
 class MessageUpdateView(LoginRequiredMixin, UpdateView):
+    """Редактирование сообщения."""
     model = Message
     form_class = MessageForm
 
@@ -138,23 +152,25 @@ class MessageUpdateView(LoginRequiredMixin, UpdateView):
 
 
 class MessageDeleteView(LoginRequiredMixin, DeleteView):
+    """Удаление сообщения."""
     model = Message
     success_url = reverse_lazy("mailing:message_list")
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
-
         if obj.owner != self.request.user:
             raise PermissionDenied("У вас не достаточно прав для удаления данного сообщения.")
         return obj
 
 
 class MailingListView(LoginRequiredMixin, ListView):
+    """Представление для отображения списка рассылок."""
     model = Mailing
     context_object_name = "mailings"
     paginate_by = 10
 
     def get_queryset(self):
+        """Фильтрует рассылки по правам доступа."""
         if self.request.user.groups.filter(name="Менеджер").exists():
             return Mailing.objects.all()
         return Mailing.objects.filter(owner=self.request.user, is_active=True)
@@ -162,6 +178,7 @@ class MailingListView(LoginRequiredMixin, ListView):
 
 @method_decorator(cache_page(60 * 15), name="dispatch")
 class MailingDetailView(LoginRequiredMixin, DetailView):
+    """Просмотр дельной информации о рассылке с кэшированием."""
     model = Mailing
     context_object_name = "mailing"
 
@@ -173,6 +190,7 @@ class MailingDetailView(LoginRequiredMixin, DetailView):
 
 
 class MailingCreateView(LoginRequiredMixin, CreateView):
+    """Создание новой рассылки."""
     model = Mailing
     form_class = MailingForm
 
@@ -180,8 +198,8 @@ class MailingCreateView(LoginRequiredMixin, CreateView):
         return reverse_lazy("mailing:mailing_detail", kwargs={"pk": self.object.pk})
 
     def get_form(self, form_class=None):
+        """Фильтрует доступные сообщения и получателей."""
         form = super().get_form(form_class)
-
         form.fields["message"].queryset = Message.objects.filter(owner=self.request.user)
         form.fields["recipients"].queryset = Recipient.objects.filter(owner=self.request.user)
         return form
@@ -192,6 +210,7 @@ class MailingCreateView(LoginRequiredMixin, CreateView):
 
 
 class MailingUpdateView(LoginRequiredMixin, UpdateView):
+    """Редактирование рассылки."""
     model = Mailing
     form_class = MailingUpdateForm
 
@@ -200,32 +219,32 @@ class MailingUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
-
         form.fields["message"].queryset = Message.objects.filter(owner=self.request.user)
         form.fields["recipients"].queryset = Recipient.objects.filter(owner=self.request.user)
         return form
 
     def form_valid(self, form):
         obj = self.get_object()
-
         if obj.owner != self.request.user:
             raise PermissionDenied("У вас не достаточно прав для редактирования данной рассылки.")
         return super().form_valid(form)
 
 
 class MailingDeleteView(LoginRequiredMixin, DeleteView):
+    """Удаление рассылки."""
     model = Mailing
     success_url = reverse_lazy("mailing:mailing_list")
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
-
         if obj.owner != self.request.user:
             raise PermissionDenied("У вас не достаточно прав для удаления данной рассылки.")
         return obj
 
 
 class DisableMailingView(LoginRequiredMixin, View):
+    """Отключение рассылки (требует специального разрешения)."""
+
     def post(self, request, pk):
         disable_mailing = get_object_or_404(Mailing, pk=pk)
 
@@ -238,6 +257,8 @@ class DisableMailingView(LoginRequiredMixin, View):
 
 
 class EnableMailingView(LoginRequiredMixin, View):
+    """Включение рассылки (требует специального разрешения)."""
+
     def post(self, request, pk):
         disable_mailing = get_object_or_404(Mailing, pk=pk)
 
@@ -250,6 +271,8 @@ class EnableMailingView(LoginRequiredMixin, View):
 
 
 class SendMailingView(LoginRequiredMixin, View):
+    """Ручной запуск рассылки."""
+
     def post(self, request, pk):
         mailing = get_object_or_404(Mailing, pk=pk)
         if mailing.owner == self.request.user:
@@ -267,6 +290,7 @@ class SendMailingView(LoginRequiredMixin, View):
 
 
 class MainPageView(TemplateView):
+    """Главная страница с общей статистикой."""
     template_name = "mailing/main_page.html"
 
     def get_context_data(self, **kwargs):
@@ -278,6 +302,7 @@ class MainPageView(TemplateView):
 
 
 class MailingAttemptListView(LoginRequiredMixin, ListView):
+    """Список попыток рассылки для текущего пользователя."""
     model = MailingAttempt
     template_name = "mailing/mailing_attempt_list.html"
     context_object_name = "mailing_attempts"
@@ -288,6 +313,7 @@ class MailingAttemptListView(LoginRequiredMixin, ListView):
 
 
 class StatisticsView(LoginRequiredMixin, TemplateView):
+    """Страница персональной статистики пользователя."""
     template_name = "mailing/statistics.html"
 
     def get_context_data(self, **kwargs):

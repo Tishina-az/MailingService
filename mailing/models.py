@@ -4,6 +4,7 @@ from users.models import CustomUser
 
 
 class Recipient(models.Model):
+    """Модель получателя рассылки."""
     email = models.EmailField(verbose_name="Email")
     first_name = models.CharField(max_length=50, verbose_name="Имя")
     last_name = models.CharField(max_length=50, verbose_name="Фамилия")
@@ -17,6 +18,7 @@ class Recipient(models.Model):
 
     @property
     def full_name(self):
+        """Возвращает полное имя в формате 'Фамилия Имя Отчество'."""
         full_name = f"{self.last_name} {self.first_name}"
         if self.middle_name:
             full_name += f" {self.middle_name}"
@@ -30,6 +32,7 @@ class Recipient(models.Model):
 
 
 class Message(models.Model):
+    """Модель сообщения для рассылки."""
     subject = models.CharField(max_length=100, verbose_name="Тема письма")
     body = models.TextField(verbose_name="Текст письма")
 
@@ -45,6 +48,7 @@ class Message(models.Model):
 
 
 class Mailing(models.Model):
+    """Модель рассылки."""
     CREATED = "created"
     LAUNCHED = "launched"
     COMPLETED = "completed"
@@ -69,7 +73,7 @@ class Mailing(models.Model):
         return self.status
 
     def get_recipient_emails(self):
-        """Получение списка адресатов рассылки"""
+        """Возвращает список email всех получателей рассылки."""
         return [recipient.email for recipient in self.recipients.all()]
 
     class Meta:
@@ -83,7 +87,7 @@ class Mailing(models.Model):
 
 
 class MailingAttempt(models.Model):
-    """Модель 'Попытка рассылки' — это запись о каждой попытке отправки сообщения по рассылке"""
+    """Модель 'Попытка рассылки' — это запись о каждой попытке отправки сообщения по рассылке."""
 
     SUCCESSFULLY = "successfully"
     UNSUCCESSFULLY = "unsuccessfully"

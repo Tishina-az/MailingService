@@ -7,7 +7,15 @@ from mailing.models import Recipient, Message, Mailing
 
 
 class StyleFormMixin():
+    """Миксин для стилизации полей формы.
+
+    Автоматически добавляет CSS-классы к полям формы:
+    - `form-control` для стандартных полей
+    - `form-check-input` для чекбоксов (BooleanField)
+    """
+
     def __init__(self, *args, **kwargs):
+        """Инициализирует миксин и применяет стили к полям формы."""
         super().__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
             if isinstance(field, BooleanField):
@@ -17,11 +25,13 @@ class StyleFormMixin():
 
 
 class RecipientForm(StyleFormMixin, forms.ModelForm):
+    """Форма для создания и редактирования получателей рассылки."""
     class Meta:
         model = Recipient
         exclude = ['owner',]
 
     def __init__(self, *args, **kwargs):
+        """Инициализирует форму, устанавливает плейсхолдеры и подсказки."""
         self.request = kwargs.pop('request', None)
         super(RecipientForm, self).__init__(*args, **kwargs)
 
@@ -45,6 +55,7 @@ class RecipientForm(StyleFormMixin, forms.ModelForm):
         })
 
     def clean_email(self):
+        """Проверяет уникальность email получателя для текущего пользователя."""
         email = self.cleaned_data.get('email')
 
         owner = getattr(self.instance, 'owner', None)
@@ -58,6 +69,7 @@ class RecipientForm(StyleFormMixin, forms.ModelForm):
 
 
 class MessageForm(StyleFormMixin, forms.ModelForm):
+    """Форма для создания и редактирования сообщений рассылки."""
     class Meta:
         model = Message
         exclude = ['owner', ]
@@ -67,11 +79,13 @@ class MessageForm(StyleFormMixin, forms.ModelForm):
 
 
 class MailingForm(StyleFormMixin, forms.ModelForm):
+    """Форма для создания рассылки."""
     class Meta:
         model = Mailing
         fields = ['message', 'recipients']
 
     def __init__(self, *args, **kwargs):
+        """Инициализирует форму, добавляет подсказку для поля получателей."""
         super(MailingForm, self).__init__(*args, **kwargs)
 
         self.fields['recipients'].help_text = mark_safe(
@@ -79,11 +93,13 @@ class MailingForm(StyleFormMixin, forms.ModelForm):
 
 
 class MailingUpdateForm(StyleFormMixin, forms.ModelForm):
+    """Форма для обновления рассылки (изменения статуса, получателей и сообщения)."""
     class Meta:
         model = Mailing
         fields = ['status', 'message', 'recipients',]
 
     def __init__(self, *args, **kwargs):
+        """Инициализирует форму, добавляет подсказку для поля получателей."""
         super(MailingUpdateForm, self).__init__(*args, **kwargs)
 
         self.fields['recipients'].help_text = mark_safe(

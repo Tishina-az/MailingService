@@ -3,7 +3,13 @@ from django.db import models
 
 
 class CustomUserManager(BaseUserManager):
+    """Кастомный менеджер пользователей для работы с email вместо username.
+    Наследуется от BaseUserManager и переопределяет методы создания пользователей.
+    """
+
     def create_user(self, email, password=None, **extra_fields):
+        """Создает и сохраняет обычного пользователя с указанным email и паролем."""
+
         if not email:
             raise ValueError('The Email field must be set')
         email = self.normalize_email(email)
@@ -13,6 +19,8 @@ class CustomUserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
+        """Создает и сохраняет суперпользователя с расширенными правами."""
+
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
@@ -25,6 +33,8 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractUser):
+    """Кастомная модель пользователя, использующая email вместо username."""
+
     username = None
     email = models.EmailField(unique=True, verbose_name='Email')
     avatar = models.ImageField(upload_to='avatar/', blank=True, null=True, verbose_name='Аватар',
@@ -46,4 +56,5 @@ class CustomUser(AbstractUser):
         ]
 
     def __str__(self):
+        """Строковое представление пользователя (email)."""
         return self.email

@@ -19,11 +19,13 @@ from users.services import UserService
 
 
 class RegisterView(CreateView):
+    """Представление для регистрации новых пользователей."""
     template_name = 'users/register.html'
     form_class = CustomUserCreationForm
     success_url = reverse_lazy('users:login')
 
     def form_valid(self, form):
+        """Обрабатывает успешную валидацию формы регистрации."""
         user = form.save()
         user.is_active = False
         token = secrets.token_hex(16)
@@ -36,17 +38,20 @@ class RegisterView(CreateView):
 
 
 class CustomLoginView(LoginView):
+    """Кастомное представление для входа пользователей."""
     template_name = 'users/login.html'
     form_class = CustomUserLoginForm
 
 
 @method_decorator(cache_page(60 * 15), name='dispatch')
 class CustomUserDetailView(LoginRequiredMixin, DetailView):
+    """Представление для просмотра профиля пользователя с кэшированием на 15 минут."""
     model = CustomUser
     template_name = 'users/profile.html'
 
 
 class CustomUserUpdate(LoginRequiredMixin, UpdateView):
+    """Представление для обновления профиля пользователя."""
     model = CustomUser
     template_name = 'users/register.html'
     form_class = CustomUserUpdateForm
@@ -54,6 +59,7 @@ class CustomUserUpdate(LoginRequiredMixin, UpdateView):
 
 
 class CustomPasswordResetView(PasswordResetView):
+    """Кастомное представление для сброса пароля."""
     template_name = 'users/password_reset_form.html'
     email_template_name = 'users/password_reset_email.html'
     subject_template_name = 'users/password_reset_subject.txt'
@@ -62,20 +68,24 @@ class CustomPasswordResetView(PasswordResetView):
 
 
 class CustomPasswordResetDoneView(PasswordResetDoneView):
+    """Представление страницы подтверждения отправки email для сброса пароля."""
     template_name = 'users/password_reset_done.html'
 
 
 class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    """Представление для ввода нового пароля."""
     form_class = CustomSetPasswordForm
     template_name = 'users/password_reset_confirm.html'
     success_url = reverse_lazy('users:password_reset_complete')
 
 
 class CustomPasswordResetCompleteView(PasswordResetCompleteView):
+    """Представление страницы успешного сброса пароля."""
     template_name = 'users/password_reset_complete.html'
 
 
 class CustomUserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    """Представление списка пользователей (только для администраторов)."""
     model = CustomUser
     template_name = 'users/users_list.html'
     context_object_name = 'users'
@@ -84,7 +94,10 @@ class CustomUserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 
 
 class BlockUserView(LoginRequiredMixin, View):
+    """Представление для блокировки пользователей."""
+
     def post(self, request, pk):
+        """Обрабатывает запрос на блокировку пользователя."""
         user_block = get_object_or_404(CustomUser, pk=pk)
 
         if user_block == request.user:
@@ -99,7 +112,10 @@ class BlockUserView(LoginRequiredMixin, View):
 
 
 class UnBlockUserView(LoginRequiredMixin, View):
+    """Представление для разблокировки пользователей."""
+
     def post(self, request, pk):
+        """Обрабатывает запрос на разблокировку пользователя."""
         user_unblock = get_object_or_404(CustomUser, pk=pk)
 
         if user_unblock == request.user:
