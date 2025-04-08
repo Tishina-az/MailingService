@@ -1,0 +1,129 @@
+import secrets
+
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.views import LoginView, PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, \
+    PasswordResetCompleteView
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404, redirect
+
+from django.urls import reverse_lazy, reverse
+from django.utils.decorators import method_decorator
+from django.views import View
+from django.views.decorators.cache import cache_page
+from django.views.generic import CreateView, UpdateView, DetailView, ListView
+
+from users.forms import CustomUserCreationForm, CustomUserLoginForm, CustomUserUpdateForm, CustomPasswordResetForm, \
+    CustomSetPasswordForm
+from users.models import CustomUser
+from users.services import UserService
+
+
+class RegisterView(CreateView):
+    """Представление для регистрации новых пользователей."""
+    template_name = 'users/register.html'
+    form_class = CustomUserCreationForm
+    success_url = reverse_lazy('users:login')
+
+    def form_valid(self, form):
+        """Обрабатывает успешную валидацию формы регистрации."""
+        user = form.save()
+        user.is_active = False
+        token = secrets.token_hex(16)
+        user.token = token
+        user.save()
+        host = self.request.get_host()
+        url = f'http://{host}/users/confirm/{token}/'
+        UserService.send_verification_email(user.email, host, url)
+        return super().form_valid(form)
+
+
+class CustomLoginView(LoginView):
+    """Кастомное представление для входа пользователей."""
+    template_name = 'users/login.html'
+    form_class = CustomUserLoginForm
+
+
+@method_decorator(cache_page(60 * 15), name='dispatch')
+class CustomUserDetailView(LoginRequiredMixin, DetailView):
+    """Представление для просмотра профиля пользователя с кэшированием на 15 минут."""
+    model = CustomUser
+    template_name = 'users/profile.html'
+
+
+class CustomUserUpdate(LoginRequiredMixin, UpdateView):
+    """Представление для обновления профиля пользователя."""
+    model = CustomUser
+    template_name = 'users/register.html'
+    form_class = CustomUserUpdateForm
+    success_url = reverse_lazy('mailing:main_page')
+
+
+class CustomPasswordResetView(PasswordResetView):
+    """Кастомное представление для сброса пароля."""
+    template_name = 'users/password_reset_form.html'
+    email_template_name = 'users/password_reset_email.html'
+    subject_template_name = 'users/password_reset_subject.txt'
+    form_class = CustomPasswordResetForm
+    success_url = reverse_lazy('users:password_reset_done')
+
+
+class CustomPasswordResetDoneView(PasswordResetDoneView):
+    """Представление страницы подтверждения отправки email для сброса пароля."""
+    template_name = 'users/password_reset_done.html'
+
+
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    """Представление для ввода нового пароля."""
+    form_class = CustomSetPasswordForm
+    template_name = 'users/password_reset_confirm.html'
+    success_url = reverse_lazy('users:password_reset_complete')
+
+
+class CustomPasswordResetCompleteView(PasswordResetCompleteView):
+    """Представление страницы успешного сброса пароля."""
+    template_name = 'users/password_reset_complete.html'
+
+
+class CustomUserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    """Представление списка пользователей (только для администраторов)."""
+    model = CustomUser
+    template_name = 'users/users_list.html'
+    context_object_name = 'users'
+    permission_required = 'users.view_customuser'
+    paginate_by = 20
+
+
+class BlockUserView(LoginRequiredMixin, View):
+    """Представление для блокировки пользователей."""
+
+    def post(self, request, pk):
+        """Обрабатывает запрос на блокировку пользователя."""
+        user_block = get_object_or_404(CustomUser, pk=pk)
+
+        if user_block == request.user:
+            raise PermissionDenied('Вы не можете заблокировать самого себя!')
+
+        if self.request.user.has_perm('users.can_block_user'):
+            user_block.is_active = False
+            user_block.save()
+            return redirect(reverse('users:users_list'))
+        else:
+            raise PermissionDenied('У вас не достаточно прав для блокировки пользователя.')
+
+
+class UnBlockUserView(LoginRequiredMixin, View):
+    """Представление для разблокировки пользователей."""
+
+    def post(self, request, pk):
+        """Обрабатывает запрос на разблокировку пользователя."""
+        user_unblock = get_object_or_404(CustomUser, pk=pk)
+
+        if user_unblock == request.user:
+            raise PermissionDenied('Вы не можете заблокировать самого себя!')
+
+        if self.request.user.has_perm('users.can_unblock_user'):
+            user_unblock.is_active = True
+            user_unblock.save()
+            return redirect(reverse('users:users_list'))
+        else:
+            raise PermissionDenied('У вас не достаточно прав для разблокировки пользователя.')

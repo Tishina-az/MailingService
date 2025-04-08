@@ -1,0 +1,9 @@
+<script>
+    function showConfirmModal(actionUrl, message) {
+        const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        document.getElementById('modalBody').textContent = message;
+        const form = document.getElementById('actionForm');
+        form.action = actionUrl;
+        modal.show();
+    }
+</script>

@@ -1,0 +1,71 @@
+{% extends 'mailing/base.html' %}
+
+{% block title %}Сообщения{% endblock %}
+
+{% block content %}
+<nav class="mb-5 text-center">
+    <a class="p-2 btn btn-outline-primary" href="{% url 'mailing:mailing_create' %}">Добавить рассылку</a>
+</nav>
+<div class="container">
+    <h3 class="text-center mb-3">Список рассылок:</h3>
+    <div class="row text-center">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Старт рассылки</th>
+                    <th scope="col">Окончание рассылки</th>
+                    <th scope="col">Статус</th>
+                    <th scope="col">Тема рассылки</th>
+                    <th scope="col">Получатели</th>
+                    {% if perms.mailing.view_mailing %}
+                        <th scope="col">Владелец</th>
+                    {% endif %}
+                    {% if perms.mailing.can_disable_mailing %}
+                        <th scope="col">Отключение/Включение</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for mailing in mailings %}
+                <tr onclick="window.location='{% url 'mailing:mailing_detail' mailing.pk %}';" style="cursor: pointer;">
+                    <th class="col" scope="row">{{ mailing.id }}</th>
+                    <td class="col">{{ mailing.started_date|date:"d F Yг. H:i:s" }}</td>
+                    <td class="col">{{ mailing.ended_date|date:"d F Yг. H:i:s" }}</td>
+                    <td class="col">{{ mailing.get_status_display }}</td>
+                    <td class="col">{{ mailing.message }}</td>
+                    <td class="col">
+                        {% for email in mailing.get_recipient_emails %}
+                            <a class="link-opacity-75-hover" href="mailto: {{ email }}" onclick="event.stopPropagation();">{{ email }}</a>
+                        {% endfor %}
+                    </td>
+                    {% if perms.mailing.view_mailing %}
+                        <td class="col">{{ mailing.owner.get_full_name }}</td>
+                    {% endif %}
+                    {% if perms.mailing.can_disable_mailing and mailing.is_active %}
+                    <td>
+                        <button class="btn btn-outline-danger" onclick="event.stopPropagation(); showConfirmModal(
+                                '{% url 'mailing:mailing_disable' mailing.pk %}',
+                                'Отключить рассылку {{ mailing.message|truncatechars:20 }}?')">
+                            Отключить
+                        </button>
+                    </td>
+                    {% elif perms.mailing.can_enable_mailing and not mailing.is_active %}
+                    <td>
+                        <button class="btn btn-outline-success" onclick="event.stopPropagation(); showConfirmModal(
+                                '{% url 'mailing:mailing_enable' mailing.pk %}',
+                                'Включить рассылку {{ mailing.message|truncatechars:20 }}?')">
+                            Включить
+                        </button>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include 'mailing/pagination.html' %}
+</div>
+{% include 'users/modal_script.html' %}
+{% include 'users/modal_confirm.html' %}
+{% endblock %}

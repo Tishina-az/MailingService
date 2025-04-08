@@ -1,0 +1,34 @@
+{% extends 'mailing/base.html' %}
+
+{% block title %}Попытки рассылки{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h3 class="text-center mb-3">Попытки рассылок:</h3>
+    <div class="row text-center">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Дата и время попытки</th>
+                <th scope="col">Тема рассылки</th>
+                <th scope="col">Статус попытки</th>
+                <th scope="col">Ответ почтового сервера</th>
+            </tr>
+            </thead>
+            <tbody class="table-group-divider">
+            {% for attempt in mailing_attempts %}
+            <tr>
+                <th class="col-1" scope="row">{{ attempt.id }}</th>
+                <td class="col-2">{{ attempt.attempt_date|date:"d F Yг. H:i:s" }}</td>
+                <td class="col-2">{{ attempt.mailing.message }}</td>
+                <td class="col-2">{{ attempt.get_status_display }}</td>
+                <td class="col-4">{{ attempt.response_mail_server }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include 'mailing/pagination.html' %}
+</div>
+{% endblock %}

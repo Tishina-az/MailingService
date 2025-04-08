@@ -1,0 +1,59 @@
+{% extends 'mailing/base.html' %}
+
+{% block title %}Детали рассылки{% endblock %}
+
+{% block content %}
+<div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-body-tertiary">
+    <div class="col-md-10 p-lg-5 mx-auto my-5">
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <h1 class="display-3 fw-bold mb-5">Рассылка: "{{ mailing.message }}"</h1>
+        <!-- Преобразуем status в читаемое значение с помощью метода get_status_display (только для поля choices) -->
+        <h4 class="fw-normal text-muted mb-3">Статус рассылки: {{ mailing.get_status_display }}</h4>
+        <h4 class="fw-normal text-muted mb-3">Старт рассылки: {{ mailing.started_date|date:"d F Yг. H:i:s" }}</h4>
+        <h4 class="fw-normal text-muted mb-3">Окончание рассылки: {{ mailing.ended_date|date:"d F Yг. H:i:s" }}</h4>
+        <h3 class="fw-normal mt-5 mb-3">{{ mailing.message.body|safe }}</h3>
+        <h3 class="fw-normal mt-5 mb-3">
+            Список получателей рассылки:
+            {% for email in mailing.get_recipient_emails %}
+            <a class="link-opacity-75-hover" href="mailto: {{ email }}" onclick="event.stopPropagation();">{{ email }}</a>
+            {% endfor %}
+        </h3>
+        <div class="d-flex gap-3 justify-content-center lead fw-normal mt-5 mb-2">
+            <a class="btn btn-primary" href="{% url 'mailing:mailing_list' %}">
+                К списку рассылок
+            </a>
+            {% if user == mailing.owner %}
+                {% if mailing.status == mailing.CREATED %}
+                    <!-- Запуск рассылки вручную -->
+                    <form method="post" action="{% url 'mailing:mailing_send' mailing.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success">
+                            Отправить рассылку
+                        </button>
+                    </form>
+                {% endif %}
+                <a class="btn btn-warning" href="{% url 'mailing:mailing_update' mailing.pk %}">
+                    Редактировать
+                </a>
+                <a class="btn btn-danger" href="{% url 'mailing:mailing_delete' mailing.pk %}">
+                    Удалить
+                </a>
+            {% endif %}
+        </div>
+        <small id="mailingHelp" class="text-muted">
+            *Для повторной отправки данной рассылки нажмите кнопку "Редактировать" и измените статус на "Создано".
+            <p>После чего появиться кнопка "Отправить рассылку".</p>
+        </small>
+    </div>
+    <div class="product-device shadow-sm d-none d-md-block"></div>
+    <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'mailing/base.html' %}
+
+{% block title %}Список получателей{% endblock %}
+
+{% block content %}
+<nav class="mb-5 text-center">
+    <a class="p-2 btn btn-outline-primary" href="{% url 'mailing:recipient_create' %}">Добавить получателя</a>
+</nav>
+<div class="container">
+    <h3 class="text-center mb-3">Список получателей рассылок:</h3>
+    <div class="row text-center">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Ф.И.О.</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Комментарий</th>
+                    {% if perms.mailing.view_recipient %}
+                        <th scope="col">Владелец</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for recipient in recipients %}
+                <tr onclick="window.location='{% url 'mailing:recipient_detail' recipient.pk %}';" style="cursor: pointer;">
+                    <th scope="row">{{ recipient.id }}</th>
+                    <td>{{ recipient.full_name }}</td>
+                    <td>
+                        <a class="link-opacity-75-hover" href="mailto: {{ recipient.email }}" onclick="event.stopPropagation();">{{ recipient.email }}</a>
+                    </td>
+                    <td>{{ recipient.comment|truncatechars:100 }}</td>
+                    {% if perms.mailing.view_recipient %}
+                        <td>{{ recipient.owner.get_full_name }}</td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include 'mailing/pagination.html' %}
+</div>
+{% endblock %}

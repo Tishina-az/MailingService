@@ -1,0 +1,39 @@
+{% extends 'mailing/base.html' %}
+
+{% block title %}Сообщения{% endblock %}
+
+{% block content %}
+<nav class="mb-5 text-center">
+    <a class="p-2 btn btn-outline-primary" href="{% url 'mailing:message_create' %}">Добавить сообщение</a>
+</nav>
+<div class="container">
+    <h3 class="text-center mb-3">Список доступных сообщений:</h3>
+    <div class="row text-center">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Тема письма</th>
+                    <th scope="col">Тело письма</th>
+                    {% if perms.mailing.view_message %}
+                        <th scope="col">Владелец</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+            {% for message in messages %}
+                <tr onclick="window.location='{% url 'mailing:message_detail' message.pk %}';" style="cursor: pointer;">
+                    <th class="col" scope="row">{{ message.id }}</th>
+                    <td class="col">{{ message.subject }}</td>
+                    <td class="col">{{ message.body|truncatechars:200 }}</td>
+                    {% if perms.mailing.view_message %}
+                        <td class="col">{{ message.owner.get_full_name }}</td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include 'mailing/pagination.html' %}
+</div>
+{% endblock %}
